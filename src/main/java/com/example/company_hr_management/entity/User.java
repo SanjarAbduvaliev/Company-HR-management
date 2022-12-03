@@ -1,6 +1,7 @@
 package com.example.company_hr_management.entity;
 
 import com.example.company_hr_management.entity.turniket.Turniket;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -65,6 +67,10 @@ public class User implements UserDetails {
 
     @OneToOne
     private Turniket turniket;
+
+    @JsonIgnore
+    @ManyToMany
+    private List<Tasks> tasks;
 
 
     private String emailCode;

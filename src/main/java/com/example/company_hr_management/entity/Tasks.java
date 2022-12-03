@@ -7,7 +7,10 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.Date;
 import java.util.Set;
@@ -17,6 +20,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@EntityListeners(value = AuditingEntityListener.class)
 public class Tasks {
     @Id
     @GeneratedValue
@@ -32,6 +36,11 @@ public class Tasks {
     @CreatedDate
     @Column(nullable = false)
     private Date createdTask;
+
+    @CreatedBy
+    private UUID createdByTask;
+    @LastModifiedBy
+    private UUID updatedByTask;
 
     @Column(nullable = false)
     @JsonFormat(pattern = "yyyy/MM/dd")

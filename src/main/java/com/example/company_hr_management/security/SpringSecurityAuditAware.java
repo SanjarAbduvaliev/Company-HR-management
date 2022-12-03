@@ -1,6 +1,7 @@
 package com.example.company_hr_management.security;
 
 import com.example.company_hr_management.entity.User;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -10,7 +11,7 @@ import java.util.UUID;
 
 public class SpringSecurityAuditAware implements AuditorAware<UUID> {
     @Override
-    public Optional<UUID> getCurrentAuditor() {
+    public @NotNull Optional<UUID> getCurrentAuditor() {
         //TIZIMDA SHU USER TURIBDI
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication!=null

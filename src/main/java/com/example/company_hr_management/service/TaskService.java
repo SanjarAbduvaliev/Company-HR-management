@@ -2,6 +2,7 @@ package com.example.company_hr_management.service;
 
 import com.example.company_hr_management.entity.Tasks;
 import com.example.company_hr_management.entity.User;
+import com.example.company_hr_management.entity.enums.RoleNames;
 import com.example.company_hr_management.payload.ApiResponse;
 import com.example.company_hr_management.payload.TaskDto;
 import com.example.company_hr_management.repository.TaskRepository;
@@ -25,20 +26,53 @@ public class TaskService {
     @Autowired
     TaskRepository taskRepository;
     public ApiResponse addTask(TaskDto taskDto){
-        Tasks tasks=new Tasks();
-        tasks.setCreatedTask(new Date());
-        tasks.setDeadline(taskDto.getDeadline());
-        tasks.setName(taskDto.getName());
-        tasks.setActive(taskDto.isActive());
-        tasks.setTaskAbout(taskDto.getTaskAbout());
-        Set<User> userSet = userRepository.findAllById(taskDto.getUserId());
-        tasks.setUsers(userSet);
-        taskRepository.save(tasks);
-        for (User user : userSet) {
-            mailSender(user.getEmail(),taskDto.getTaskAbout());
+
+
+        List<User> allUserFrom = userRepository.findAll();
+        for (User allUser : allUserFrom) {
+            //DERECTOR MANAGERLARGA ISH BIRIKTIRYABDI
+            if (allUser.getRoles().equals(RoleNames.DERECTOR)){
+                for (User manager : allUserFrom) {
+                    if (manager.getRoles().equals(RoleNames.HR_MANAGER)){
+                        List<Tasks> managerTasks = manager.getTasks();
+                        Tasks tasks=new Tasks();
+                        tasks.setCreatedTask(new Date());
+                        tasks.setDeadline(taskDto.getDeadline());
+                        tasks.setName(taskDto.getName());
+                        tasks.setActive(taskDto.isActive());
+                        tasks.setTaskAbout(taskDto.getTaskAbout());
+                        managerTasks.add(tasks);
+                        taskRepository.save(managerTasks.get(managerTasks.size()-1));
+
+                        mailSender(manager.getEmail(),taskDto.getTaskAbout());
+                    }
+                }
+                return new ApiResponse("Vazifa topshirildi Managerlarga  yuborildi",true);
+
+            }
+
+            // MANAGER WORKERLARGA ISH BIRIKTIRYABDI
+            if (allUser.getRoles().equals(RoleNames.HR_MANAGER)){
+                for (User worker : allUserFrom) {
+                    boolean equals = worker.getRoles().equals(RoleNames.WORKER);
+                    if (equals){
+                        List<Tasks> tasksWorker = worker.getTasks();
+                        Tasks task=new Tasks();
+                        task.setCreatedTask(new Date());
+                        task.setTaskAbout(taskDto.getTaskAbout());
+                        task.setDeadline(taskDto.getDeadline());
+                        task.setName(taskDto.getName());
+                        task.setActive(taskDto.isActive());
+                        tasksWorker.add(task);
+                        taskRepository.save(tasksWorker.get(tasksWorker.size()-1));
+
+                    }
+                }
+                return new ApiResponse("Vazifa topshirildi Workerga  yuborildi",true);
+            }
         }
 
-        return new ApiResponse("Vazifa qo'shildi",true);
+        return new ApiResponse("Vazifa qo'shilmadi",false);
 
     }
     public List<Tasks> getTask(TaskDto taskDto){
