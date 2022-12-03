@@ -97,7 +97,6 @@ public class AuthService implements UserDetailsService {
         return new ApiResponse("Akkontingiz avval tasdiqlangan!",false);
     }
     public ApiResponse login(LoginDto loginDto){
-        System.out.println("djsfs");
         try {
 
             Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
